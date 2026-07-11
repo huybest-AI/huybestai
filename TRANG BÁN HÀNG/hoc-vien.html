@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khu Học Viên – Huy Best AI</title>
+<meta name="description" content="Khu học viên Huy Best AI — truy cập sách và các combo khoá học Affiliate × AI theo lộ trình.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ---- dashboard shell (học viện) — dùng chung token/thành phần với assets/style.css ---- */
+.dash-shell{display:flex;align-items:flex-start;gap:1.5rem;max-width:1400px;margin:0 auto;padding:1.5rem 1rem 3rem}
+@media (min-width:640px){.dash-shell{padding:1.5rem 1.5rem 3rem}}
+.side{width:250px;flex-shrink:0;position:sticky;top:5.5rem;padding:1.25rem;display:flex;flex-direction:column;gap:.3rem;max-height:calc(100vh - 6.5rem);overflow-y:auto}
+.side-sec{font-size:.68rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent-pale);margin:1rem .3rem .4rem}
+.side-sec:first-of-type{margin-top:0}
+.side-link{display:flex;align-items:center;gap:.7rem;padding:.65rem .75rem;border-radius:.7rem;color:var(--muted-foreground);font-size:.88rem;font-weight:600;transition:.15s}
+.side-link:hover{background:color-mix(in oklab,var(--muted) 50%,transparent);color:var(--foreground)}
+.side-link.active{color:#0a0703;background:var(--grad-gold) 0 0/300% 300%;animation:6s ease-in-out infinite hue-flow}
+.side-link.danger:hover{color:#ff8080}
+.side-link svg{width:17px;height:17px;flex-shrink:0}
+@media (max-width:860px){.dash-shell{flex-direction:column}.side{position:static;width:100%;max-height:none;flex-direction:row;flex-wrap:wrap;overflow-x:auto}.side-sec{width:100%}}
+
+.dash-main{flex:1;min-width:0}
+.prog-card{padding:1rem 1.3rem;margin-bottom:1.75rem;display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap}
+.prog-track{flex:1;min-width:160px;height:8px;border-radius:999px;background:color-mix(in oklab,var(--muted) 60%,transparent);overflow:hidden}
+.prog-fill{height:100%;width:0%;background:var(--grad-gold) 0 0/300% 300%;animation:6s ease-in-out infinite hue-flow;border-radius:999px}
+.prog-txt{font-size:.82rem;font-weight:700;color:var(--muted-foreground)}
+.prog-txt b{color:var(--accent-pale)}
+
+.course-poster{aspect-ratio:3/4;position:relative;display:flex;align-items:center;justify-content:center;text-align:center;padding:1rem;background:linear-gradient(160deg,#0f2750,#091a36);color:var(--muted-foreground);font-size:.85rem;font-weight:700}
+.course-poster.special{background:linear-gradient(160deg,#2a2210,#15110a);color:var(--accent-pale)}
+.lock-tag{position:absolute;top:.6rem;right:.6rem;font-size:.65rem;font-weight:800;padding:.3rem .65rem;border-radius:999px;background:rgba(0,0,0,.55);border:1px solid var(--border);color:var(--foreground)}
+
+/* modals */
+.pm-overlay{position:fixed;inset:0;background:color-mix(in oklab,var(--background) 82%,transparent);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;z-index:9000;padding:1.25rem}
+.pm-overlay.show{display:flex}
+.pm-box{width:100%;max-width:420px;padding:2rem;position:relative}
+.pm-box.wide{max-width:460px}
+.pm-close{position:absolute;top:1rem;right:1rem;width:32px;height:32px;border-radius:999px;background:color-mix(in oklab,var(--muted) 60%,transparent);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center}
+.pm-close:hover{color:var(--foreground)}
+.pm-title{font-size:1.35rem;font-weight:800;text-align:center;margin-bottom:.3rem}
+.pm-sub{font-size:.88rem;color:var(--muted-foreground);text-align:center;margin-bottom:1.5rem}
+.pm-divider{display:flex;align-items:center;gap:.75rem;margin:1rem 0;color:var(--muted-foreground);font-size:.8rem}
+.pm-divider::before,.pm-divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+.tier-row{display:flex;gap:.6rem;margin:1.2rem 0 .5rem}
+.tier-chip{flex:1;text-align:center;justify-content:center;position:relative;flex-direction:column;gap:.15rem;padding:.7rem .4rem}
+.tier-chip .lbl{font-size:.78rem;font-weight:800}
+.tier-chip .prc{font-size:.85rem}
+.pay-amount{text-align:center;margin:1rem 0;font-size:.85rem;color:var(--muted-foreground)}
+.pay-amount b{display:block;font-size:1.5rem;color:var(--foreground);margin-top:.15rem}
+.pay-info{margin-top:.9rem;padding:.9rem 1rem;border-radius:.8rem;background:color-mix(in oklab,var(--muted) 40%,transparent);border:1px solid var(--border);font-size:.82rem;color:var(--muted-foreground);line-height:1.9}
+.pay-info b{color:var(--foreground)}
+.pay-btns{display:flex;gap:.6rem;margin-top:1.1rem}
+.pay-btns>*{flex:1;text-align:center;font-size:.88rem}
+
+/* cart drawer */
+.cart-ov{position:fixed;inset:0;background:rgba(1,3,12,.7);z-index:8500;display:none}
+.cart-ov.show{display:block}
+.cart-drawer{position:fixed;right:0;top:0;bottom:0;width:380px;max-width:100vw;background:linear-gradient(#0d1a33,#051127);border-left:1px solid var(--border);display:flex;flex-direction:column;transform:translateX(100%);transition:.28s cubic-bezier(.32,.72,0,1)}
+.cart-ov.show .cart-drawer{transform:translateX(0)}
+.cart-hd{padding:1.25rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cart-hd-title{font-size:1.05rem;font-weight:800}
+.cart-x{width:34px;height:34px;border-radius:999px;background:color-mix(in oklab,var(--muted) 60%,transparent);color:var(--muted-foreground);display:flex;align-items:center;justify-content:center}
+.cart-empty{padding:4rem 1.5rem;text-align:center;color:var(--muted-foreground)}
+.cart-empty-ico{font-size:2.6rem;opacity:.4;margin-bottom:.75rem}
+
+/* chat fab */
+.chat-fab{position:fixed;right:1.4rem;bottom:1.4rem;z-index:8000;width:56px;height:56px;border-radius:999px;background:var(--grad-gold) 0 0/300% 300%;animation:6s ease-in-out infinite hue-flow;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px -6px rgba(0,0,0,.9),0 0 26px rgba(0,0,0,.7);transition:transform .2s}
+.chat-fab:hover{transform:translateY(-3px) scale(1.05)}
+.chat-fab svg{width:28px;height:28px;color:#0a0703}
+.chat-label{position:fixed;right:5.6rem;bottom:2.1rem;z-index:8000;display:flex;align-items:center;gap:.4rem;background:var(--card);border:1px solid var(--border);color:var(--foreground);font-size:.8rem;font-weight:700;padding:.45rem .8rem;border-radius:999px;white-space:nowrap}
+.chat-label .dot{width:7px;height:7px;border-radius:999px;background:var(--accent-pale)}
+@media (max-width:480px){.chat-label{display:none}}
+</style>
+</head>
+<body>
+
+<div class="neon-frame" aria-hidden="true"><div class="led-runner"></div></div>
+<div class="top-strip"></div>
+
+<header class="site-header">
+  <div class="container header-row">
+    <a href="index.html" class="logo">
+      <span class="name text-gradient-gold">HUY BEST AI</span>
+      <span class="tagline">ĐỒNG HÀNH CÙNG BẠN</span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>Trang chủ</span></a>
+      <a href="cong-dong-2usd.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><span>Cộng đồng 2$</span></a>
+      <a href="tool-trai-nghiem.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg><span>Tài Liệu</span></a>
+      <a href="san-pham-ai.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 10a4 4 0 0 1-8 0"></path><path d="M3.103 6.034h17.794"></path><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"></path></svg><span>Sản Phẩm AI</span></a>
+      <a href="khoa-hoc-ai.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg><span>Khóa Học AI</span></a>
+      <a href="do-cong-nghe.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v2"></path><path d="M12 2v2"></path><path d="M17 20v2"></path><path d="M17 2v2"></path><path d="M2 12h2"></path><path d="M2 17h2"></path><path d="M2 7h2"></path><path d="M20 12h2"></path><path d="M20 17h2"></path><path d="M20 7h2"></path><path d="M7 20v2"></path><path d="M7 2v2"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="8" y="8" width="8" height="8" rx="1"></rect></svg><span>Đồ Công Nghệ</span></a>
+      <a href="affiliate.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"></path><path d="M20 11v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"></path><path d="M7.5 7a1 1 0 0 1 0-5A4.8 8 0 0 1 12 7a4.8 8 0 0 1 4.5-5 1 1 0 0 1 0 5"></path><rect x="3" y="7" width="18" height="4" rx="1"></rect></svg><span>Affiliate</span></a>
+      <a href="hoc-vien.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg><span>Học Viện</span></a>
+      <a href="admin.html" class="nav-link"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg><span>Đăng nhập / Đăng ký</span></a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="dash-shell">
+
+    <aside class="side card-glow">
+      <div class="side-sec">Main Menu</div>
+      <a class="side-link active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14.5"/><path d="M4 19.5A1.5 1.5 0 0 1 5.5 18H20"/></svg> Khóa học</a>
+      <a class="side-link" href="cong-dong-2usd.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3 2.5-5 6-5s6 2 6 5"/></svg> Cộng đồng</a>
+      <a class="side-link" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg> Tư vấn</a>
+      <a class="side-link" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg> Hỗ trợ</a>
+      <a class="side-link" href="affiliate.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Đối tác</a>
+      <a class="side-link" onclick="openCart()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Giỏ hàng</a>
+
+      <div class="side-sec">Tài khoản</div>
+      <a class="side-link" onclick="pmOpen('redeem')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Nhập mật mã</a>
+      <a class="side-link danger" onclick="stubNote(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> Đăng xuất</a>
+    </aside>
+
+    <div class="dash-main">
+      <div class="page-head" style="text-align:left;margin-block:0 0 1.5rem;">
+        <h1 class="text-gradient-gold" style="font-size:clamp(1.6rem,3.5vw,2.3rem);">Khóa học của tôi</h1>
+      </div>
+
+      <div class="card-glow prog-card" style="margin-top:1.5rem;">
+        <div class="prog-txt">Tiến độ lộ trình: <b>0%</b></div>
+        <div class="prog-track"><div class="prog-fill" style="width:0%"></div></div>
+        <div class="prog-txt">0 / 7 phần</div>
+      </div>
+
+      <div class="card-grid cols-4" id="course-grid"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">© 2026 <span class="text-gradient-gold" style="font-weight:700;">HUY BEST AI</span>. Tất cả quyền được bảo lưu.</div>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="pm-overlay" id="modal-login">
+  <form class="pm-box card-glow" data-stub-form>
+    <button type="button" class="pm-close" onclick="pmClose('login')">✕</button>
+    <div class="pm-title">Đăng nhập</div>
+    <div class="pm-sub">Truy cập khu học viên của bạn</div>
+    <input class="input" type="email" placeholder="Email" style="margin-bottom:.75rem;">
+    <input class="input" type="password" placeholder="Mật khẩu" style="margin-bottom:1rem;">
+    <button type="submit" class="btn-neon btn-block">Đăng nhập</button>
+    <div class="pm-divider">hoặc</div>
+    <button type="button" class="chip btn-block" style="justify-content:center;padding:.7rem;" onclick="stubNote(this)">🔵 Đăng nhập với Google</button>
+    <p data-stub-note hidden style="text-align:center;margin-top:1rem;color:var(--accent-pale);font-size:.85rem;">Đây là giao diện mẫu — cần nối Firebase/backend thật để đăng nhập hoạt động.</p>
+  </form>
+</div>
+
+<!-- REDEEM MODAL -->
+<div class="pm-overlay" id="modal-redeem">
+  <form class="pm-box card-glow" data-stub-form>
+    <button type="button" class="pm-close" onclick="pmClose('redeem')">✕</button>
+    <div class="pm-title">Nhập mật mã</div>
+    <div class="pm-sub">Mật mã đi kèm sách để mở khóa toàn bộ combo</div>
+    <input class="input" type="text" placeholder="Nhập mật mã của bạn" style="text-align:center;letter-spacing:3px;margin-bottom:1rem;">
+    <button type="submit" class="btn-neon btn-block">Xác nhận</button>
+    <p data-stub-note hidden style="text-align:center;margin-top:1rem;color:var(--accent-pale);font-size:.85rem;">Đây là giao diện mẫu — cần backend thật để xác thực mật mã.</p>
+  </form>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="pm-overlay" id="modal-pay">
+  <form class="pm-box wide card-glow" data-stub-form>
+    <button type="button" class="pm-close" onclick="pmClose('pay')">✕</button>
+    <div class="pm-title">Mở Khóa Nội Dung</div>
+    <div class="pm-sub">Chọn gói phù hợp với bạn</div>
+    <div class="tier-row">
+      <div class="chip chip-active tier-chip" onclick="selectTier(this)"><span class="lbl">1 Tháng</span><span class="prc">___đ</span></div>
+      <div class="chip tier-chip" onclick="selectTier(this)"><span class="lbl">1 Năm</span><span class="prc">___đ</span></div>
+      <div class="chip tier-chip" onclick="selectTier(this)"><span class="lbl">Trọn Đời</span><span class="prc">___đ</span></div>
+    </div>
+    <div class="pay-amount">Số tiền thanh toán<b>___đ</b></div>
+    <div class="img-placeholder square" style="max-width:200px;margin:0 auto;border-radius:1rem;">🔲<br>Mã QR<br><small style="opacity:.7">(gắn TK ngân hàng thật)</small></div>
+    <div class="pay-info">
+      Ngân hàng: <b>___</b><br>
+      Số tài khoản: <b>___</b><br>
+      Chủ tài khoản: <b>___</b><br>
+      Nội dung CK: <b>HOCVIEN [email của bạn]</b>
+    </div>
+    <div class="pay-btns">
+      <button type="submit" class="btn-neon">Tôi đã chuyển khoản</button>
+      <button type="button" class="btn-neon-cyan" onclick="stubNote(this)">Thêm vào giỏ</button>
+    </div>
+    <p data-stub-note hidden style="text-align:center;margin-top:1rem;color:var(--accent-pale);font-size:.85rem;">Đây là giao diện mẫu — cần cổng thanh toán/tài khoản ngân hàng thật để hoạt động.</p>
+  </form>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-ov" id="cart-ov" onclick="if(event.target===this)closeCart()">
+  <div class="cart-drawer">
+    <div class="cart-hd"><div class="cart-hd-title">Giỏ hàng</div><button class="cart-x" onclick="closeCart()">✕</button></div>
+    <div class="cart-empty"><div class="cart-empty-ico">🛒</div>Giỏ hàng trống</div>
+  </div>
+</div>
+
+<a class="chat-label" href="#" target="_blank" rel="noopener"><span class="dot"></span>Nhắn tin · Rep ngay 24/7</a>
+<a class="chat-fab" href="#" target="_blank" rel="noopener" title="Nhắn tin hỗ trợ">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</a>
+
+<script src="assets/main.js"></script>
+<script>
+const COURSES = [
+  {id:'book', ch:'Sách', name:'[Tên sách của bạn]'},
+  {id:'c1', ch:'Chương 1', name:'[Chủ đề chương 1]', lessons:5},
+  {id:'c2', ch:'Chương 2', name:'[Chủ đề chương 2]', lessons:6},
+  {id:'c3', ch:'Chương 3', name:'[Chủ đề chương 3]', lessons:8},
+  {id:'c4', ch:'Chương 4', name:'[Chủ đề chương 4]', lessons:7},
+  {id:'c5', ch:'Chương 5', name:'[Chủ đề chương 5]', lessons:9},
+  {id:'sys', ch:'Đặc biệt', name:'[Bộ nội dung đặc biệt]', special:true}
+];
+function renderCourses(){
+  const grid = document.getElementById('course-grid');
+  grid.innerHTML = COURSES.map(c=>{
+    const meta = c.special ? '👑 Cộng đồng đặc biệt' : (c.lessons ? c.lessons+' bài học' : '📖 Đọc sách');
+    const priceBadge = c.special ? '🎁 Tặng kèm sách' : '🔒 Khóa';
+    return `<article class="card-glow hoverable product-card" style="cursor:pointer" onclick="pmOpen('pay')">
+      <div class="media">
+        <div class="course-poster${c.special?' special':''}">${c.ch}<br>${c.name}</div>
+        <span class="lock-tag">${priceBadge}</span>
+      </div>
+      <div class="body">
+        <h3>${c.name}</h3>
+        <p class="desc">${meta}</p>
+        <button type="button" class="btn-neon btn-block btn-sm">🔓 Mở khóa ngay</button>
+      </div>
+    </article>`;
+  }).join('');
+}
+renderCourses();
+
+function pmOpen(k){ var m=document.getElementById('modal-'+k); if(m) m.classList.add('show'); }
+function pmClose(k){ var m=document.getElementById('modal-'+k); if(m) m.classList.remove('show'); }
+function selectTier(el){
+  el.parentElement.querySelectorAll('.tier-chip').forEach(t=>t.classList.remove('chip-active'));
+  el.classList.add('chip-active');
+}
+function openCart(){ document.getElementById('cart-ov').classList.add('show'); }
+function closeCart(){ document.getElementById('cart-ov').classList.remove('show'); }
+function stubNote(el){
+  var box = el.closest('.pm-box');
+  var note = box ? box.querySelector('[data-stub-note]') : null;
+  if(note) note.hidden = false;
+  else alert('Đây là giao diện mẫu — cần backend thật (đăng nhập/thanh toán/mật mã) để hoạt động.');
+}
+</script>
+</body>
+</html>
